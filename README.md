@@ -22,7 +22,7 @@ A full-stack application that scrapes, explores, and tracks product data from Wo
 
 1. **Clone the repo**:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/Khanz9664/ProductDataExplorer.git
    cd ProductDataExplorer
    ```
 
