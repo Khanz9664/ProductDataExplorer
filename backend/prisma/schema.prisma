@@ -1,0 +1,62 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Navigation {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  lastScrapedAt DateTime @default(now())
+}
+
+model Category {
+  id            Int       @id @default(autoincrement())
+  title         String
+  slug          String    @unique
+  url           String
+  parentId      Int?
+  parent        Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children      Category[] @relation("CategoryHierarchy")
+  products      Product[]
+  lastScrapedAt DateTime  @default(now())
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  sourceId      String   @unique
+  title         String
+  price         String
+  currency      String
+  imageUrl      String?
+  sourceUrl     String   @unique
+  categoryId    Int?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  details       ProductDetail?
+  history       UserHistory[]
+  lastScrapedAt DateTime @default(now())
+}
+
+model ProductDetail {
+  id           Int     @id @default(autoincrement())
+  productId    Int     @unique
+  product      Product @relation(fields: [productId], references: [id])
+  description  String?
+  specs        Json?
+  ratingsAvg   Float?
+  reviewsCount Int?
+}
+
+model UserHistory {
+  id        Int      @id @default(autoincrement())
+  userId    String   // UUID or Session ID
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  visitedAt DateTime @default(now())
+
+  @@index([userId])
+}

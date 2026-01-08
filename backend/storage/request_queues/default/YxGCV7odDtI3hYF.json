@@ -1,0 +1,9 @@
+{
+	"id": "YxGCV7odDtI3hYF",
+	"json": "{\"id\":\"YxGCV7odDtI3hYF\",\"url\":\"https://www.worldofbooks.com/en-gb/collections/modern-fiction-books\",\"uniqueKey\":\"https://www.worldofbooks.com/en-gb/collections/modern-fiction-books\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":1,\"errorMessages\":[\"page.goto: Target page, context or browser has been closed\\nCall log:\\n\\u001b[2m  - navigating to \\\"https://www.worldofbooks.com/en-gb/collections/modern-fiction-books\\\", waiting until \\\"load\\\"\\u001b[22m\\n\\n    at gotoExtended (/home/shaddy/Desktop/ProductDataExplorer/backend/node_modules/@crawlee/src/internals/utils/playwright-utils.ts:241:17)\\n    at PlaywrightCrawler._navigationHandler (/home/shaddy/Desktop/ProductDataExplorer/backend/node_modules/@crawlee/src/internals/playwright-crawler.ts:250:28)\\n    at PlaywrightCrawler._handleNavigation (/home/shaddy/Desktop/ProductDataExplorer/backend/node_modules/@crawlee/src/internals/browser-crawler.ts:656:52)\\n    at PlaywrightCrawler._runRequestHandler (/home/shaddy/Desktop/ProductDataExplorer/backend/node_modules/@crawlee/src/internals/browser-crawler.ts:553:13)\\n    at PlaywrightCrawler._runRequestHandler (/home/shaddy/Desktop/ProductDataExplorer/backend/node_modules/@crawlee/src/internals/playwright-crawler.ts:243:9)\\n    at wrap (/home/shaddy/Desktop/ProductDataExplorer/backend/node_modules/@apify/src/index.ts:77:27)\"],\"headers\":{},\"userData\":{\"__crawlee\":{\"state\":5}}}",
+	"method": "GET",
+	"orderNo": 1767855729871,
+	"retryCount": 1,
+	"uniqueKey": "https://www.worldofbooks.com/en-gb/collections/modern-fiction-books",
+	"url": "https://www.worldofbooks.com/en-gb/collections/modern-fiction-books"
+}
