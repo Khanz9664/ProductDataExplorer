@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Backend
+    - name: Use Node.js ${{ matrix.node-version }} for Backend
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+
+    - name: Install Backend Dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: Build Backend
+      working-directory: ./backend
+      run: npm run build
+
+    # Frontend
+    - name: Use Node.js ${{ matrix.node-version }} for Frontend
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Frontend Dependencies
+      working-directory: ./frontend
+      run: npm ci
+      
+    - name: Build Frontend
+      working-directory: ./frontend
+      run: npm run build
+
+  docker-build:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    # Example Docker build step (not pushing anywhere as no registry is configured)
+    - name: Build Docker Image
+      run: |
+        docker build -t product-data-explorer-backend ./backend
+        # Note: Frontend is typically built as static or separate image. 
+        # For this demo, we just verify the backend container builds, 
+        # as the frontend is Next.js which might require args.
