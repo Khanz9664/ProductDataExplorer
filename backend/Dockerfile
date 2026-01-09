@@ -25,6 +25,9 @@ FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
 WORKDIR /usr/src/app
 
+# Create storage directory for Crawlee
+RUN mkdir -p storage
+
 # Copy package files
 COPY package*.json ./
 
