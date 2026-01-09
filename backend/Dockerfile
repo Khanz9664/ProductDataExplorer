@@ -1,13 +1,14 @@
-FROM node:18-alpine AS builder
+# Use official Playwright image to ensure all browser dependencies are present
+FROM mcr.microsoft.com/playwright:v1.49.0-jammy AS builder
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
+# Copy package files
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies including devDependencies for build
+# Install dependencies
 RUN npm ci
 
 # Copy source code
@@ -19,8 +20,8 @@ RUN npx prisma generate
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM node:18-alpine
+# Production stage - use same base to ensure runtime deps exist
+FROM mcr.microsoft.com/playwright:v1.49.0-jammy
 
 WORKDIR /usr/src/app
 
@@ -33,14 +34,6 @@ RUN npm ci --only=production
 # Copy built application from builder stage
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
-# Copy node_modules to ensure prisma client is available if needed, or rely on production install
-# Note: Prisma client is usually generated into node_modules, so we might need to copy it or regenerate it.
-# A ssafer bet for Prisma in prod is to regenerate or copy the generated client.
-# Let's simple copy the node_modules from builder if we want to be sure, OR run generate again.
-# Running generate is safer for architecture matching if stages differed, but here they are same.
-# Let's just copy the built node_modules from builder? No, builder has devDeps.
-# Let's regenerate prisma client in prod stage to be safe and clean.
-
 COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /usr/src/app/node_modules/@prisma ./node_modules/@prisma
 

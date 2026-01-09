@@ -27,12 +27,9 @@ Render offers a free tier for Web Services.
 3. **Repository**: Connect your GitHub repo `Khanz9664/ProductDataExplorer`.
 4. **Settings**:
    - **Root Directory**: `backend` (Important!)
-   - **Runtime**: Node
-   - **Build Command**: `npm ci && npx prisma generate && npm run build`
-   - **Start Command**: `npm run start:prod`
+   - **Runtime**: **Docker** (Crucial: Do not select "Node")
    - **Environment Variables**:
      - `DATABASE_URL`: (Paste your Neon/Supabase connection string here)
-     - `node_version`: `18` (or match your local version)
 5. **Deploy**: Click "Create Web Service".
    - *Note*: The free tier spins down after inactivity. It might take 50s to wake up on the first request.
 
