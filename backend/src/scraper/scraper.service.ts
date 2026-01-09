@@ -22,15 +22,26 @@ export class ScraperService {
 
     async scrapeNavigation(): Promise<any[]> {
         const data: any[] = [];
+        // Using ephemeral storage path to avoid permission issues, or ideally MemoryStorage if possible
         const storagePath = this.getUniqueStoragePath();
 
         const config = new Configuration({
             storageClientOptions: {
                 storagePath,
             },
+            // Reduce memory footprint
+            persistStorage: false,
+            writeMetadata: false,
         });
 
         const crawler = new PlaywrightCrawler({
+            // VERY IMPORTANT for Free Tier: Limit concurrency to 1 to avoid OOM
+            maxConcurrency: 1,
+            // Disable session pool to save memory
+            useSessionPool: false,
+            // Reduce browser overhead
+            headless: true,
+
             requestHandler: async ({ page }) => {
                 // Wait for menu to be available
                 await page.waitForSelector('nav', { timeout: 10000 });
@@ -47,31 +58,11 @@ export class ScraperService {
                         // Find if this has a dropdown
                         const parentUrl = el.getAttribute('href');
 
-                        // We need to return structure. 
-                        // It's easier to scrape the flattened lists from the mobile or desktop menu if visible.
-                        // Let's try grabbing the distinct groups.
-
-                        // Fallback: Just grab valid links with data attributes if available, 
-                        // or better, standard nav structure.
-
-                        // Current best guess based on WOB:
-                        // Top level: .list-menu__item--link
-                        // It's complex to get hierarchy without robust traversing. 
-                        // Let's stick to the flattening strategy but allow subCategory hint.
-
-                        // Actually, looking at debug output from earlier: 
-                        // There are multiple ULs with 'list-menu'. 
-                        // Let's try to infer hierarchy from `data-menu_category` and `data-menu_subcategory` if present,
-                        // otherwise rely on the text and standard links.
-
                         const link = (el as HTMLAnchorElement);
                         return {
                             title: title,
                             url: link.href,
                             isParent: link.hasAttribute('aria-haspopup'),
-                            // Try to find sub-elements? 
-                            // This is getting complex for a generic scraper. 
-                            // Let's revert to the `data-menu...` attribute strategy but include ALL items.
                         };
                     });
                 });
@@ -89,12 +80,6 @@ export class ScraperService {
 
                 data.push(...structuredItems); // Push to external data array
 
-                /* 
-                 Original logic was:
-                 const navItems = await page.$$eval('a[data-menu_category]', (els) => {
-                     ...
-                 });
-                 */
 
                 // Deduplicate by URL
                 const uniqueItems = Array.from(new Map(navItems.map(item => [item.url, item])).values());
@@ -122,6 +107,9 @@ export class ScraperService {
         });
 
         const crawler = new PlaywrightCrawler({
+            maxConcurrency: 1,
+            useSessionPool: false,
+            persistCookiesPerSession: false,
             requestHandler: async ({ page }) => {
                 categoryTitle = await page.title();
 
@@ -173,6 +161,9 @@ export class ScraperService {
         });
 
         const crawler = new PlaywrightCrawler({
+            maxConcurrency: 1,
+            useSessionPool: false,
+            persistCookiesPerSession: false,
             requestHandler: async ({ page }) => {
                 const title = await page.title();
 

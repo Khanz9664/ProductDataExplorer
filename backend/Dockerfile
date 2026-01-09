@@ -25,8 +25,8 @@ FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
 WORKDIR /usr/src/app
 
-# Create storage directory for Crawlee
-RUN mkdir -p storage
+# Create storage directory for Crawlee and set permissions
+RUN mkdir -p storage && chmod -R 777 storage
 
 # Copy package files
 COPY package*.json ./
