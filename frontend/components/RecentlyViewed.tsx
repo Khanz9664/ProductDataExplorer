@@ -18,6 +18,7 @@ export default function RecentlyViewed() {
                     <Link href={`/product/${item.product.sourceId}`} key={item.id} className="group block">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
                             {item.product.imageUrl && (
+                                /* eslint-disable-next-line @next/next/no-img-element */
                                 <img src={item.product.imageUrl} alt={item.product.title} className="w-full h-32 object-cover" />
                             )}
                             <div className="p-3">

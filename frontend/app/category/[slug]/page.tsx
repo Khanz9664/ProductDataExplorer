@@ -41,6 +41,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                             <div className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-shadow bg-white h-full flex flex-col">
                                 <div className="aspect-[3/4] relative bg-gray-100">
                                     {product.imageUrl ? (
+                                        /* eslint-disable-next-line @next/next/no-img-element */
                                         <img src={product.imageUrl} alt={product.title} className="object-cover w-full h-full" />
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-gray-400">No Image</div>

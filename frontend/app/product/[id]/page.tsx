@@ -34,6 +34,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="bg-gray-100 rounded-lg overflow-hidden aspect-[3/4] relative">
                         {product.imageUrl ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={product.imageUrl} alt={product.title} className="object-contain w-full h-full" />
                         ) : (
                             <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
@@ -88,6 +89,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                                     {(product.details.specs as any)['Recommendations'].map((rec: any, i: number) => (
                                         <div key={i} className="border border-gray-200 rounded-lg p-3 flex flex-col">
                                             <div className="aspect-[3/4] bg-gray-100 relative mb-2">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 {rec.image && <img src={rec.image} alt={rec.title} className="object-contain w-full h-full" />}
                                             </div>
                                             <h4 className="font-medium text-sm line-clamp-2 mb-1">{rec.title}</h4>
