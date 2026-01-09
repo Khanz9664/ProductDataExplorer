@@ -1,73 +1,73 @@
 # Deployment Guide
 
-This guide covers how to deploy the Product Data Explorer capabilities locally and via CI/CD.
+This guide covers how to deploy the Product Data Explorer capabilities locally and via CI/CD, with a focus on **Free Tier** deployment options.
 
 ## Prerequisites
-- **Node.js**: v18 or higher
-- **npm**: v9 or higher
-- **Docker & Docker Compose**: For running the database and Redis services.
+- **GitHub Account**: To host the repository.
+- **Vercel Account**: For Frontend hosting.
+- **Render.com Account**: For Backend hosting (Web Service + Database).
+- **Supabase/Neon Account** (Optional): For an alternative free PostgreSQL database.
 
-## Environment Variables
+## 1. Setup Database (Free PostgreSQL)
 
-### Backend (`/backend/.env`)
-Create a `.env` file in the `backend` directory:
-```bash
-# Database Connection (from docker-compose)
-DATABASE_URL="postgresql://user:password@localhost:5432/product_explorer?schema=public"
+You need a cloud PostgreSQL database.
+**Recommendation**: [Neon.tech](https://neon.tech) or [Supabase](https://supabase.com). Both offer excellent free tiers.
 
-# Optional: Redis (if used for caching)
-REDIS_HOST="localhost"
-REDIS_PORT=6379
-```
+1. Create a project on Neon/Supabase.
+2. Get the **Connection String** (Postgres URL).
+   - Format: `postgres://user:password@host:5432/dbname?sslmode=require`
+   - **Important**: For Prisma, you might need the connection string with `pgbouncer=true` if using connection pooling, but direct connection usually works fine for low traffic.
 
-### Frontend (`/frontend/.env.local`)
-Create a `.env.local` file in the `frontend` directory if needed (currently defaults to localhost:3000):
-```bash
-NEXT_PUBLIC_API_URL="http://localhost:3000"
-```
+## 2. Deploy Backend (NestJS) to Render.com
 
-## Option 1: Local Development with Docker Support
+Render offers a free tier for Web Services.
 
-1. **Start Infrastructure Services**
-   Run PostgreSQL and Redis using Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
+1. **Dashboard**: Go to [dashboard.render.com](https://dashboard.render.com).
+2. **New Web Service**: Click "New +" -> "Web Service".
+3. **Repository**: Connect your GitHub repo `Khanz9664/ProductDataExplorer`.
+4. **Settings**:
+   - **Root Directory**: `backend` (Important!)
+   - **Runtime**: Node
+   - **Build Command**: `npm ci && npx prisma generate && npm run build`
+   - **Start Command**: `npm run start:prod`
+   - **Environment Variables**:
+     - `DATABASE_URL`: (Paste your Neon/Supabase connection string here)
+     - `node_version`: `18` (or match your local version)
+5. **Deploy**: Click "Create Web Service".
+   - *Note*: The free tier spins down after inactivity. It might take 50s to wake up on the first request.
 
-2. **Backend Setup**
-   ```bash
-   cd backend
-   npm install
-   npx prisma migrate dev  # Initialize/Update Database Schema
-   npm run start:dev
-   ```
-   The backend will be available at `http://localhost:3000`.
+**Capture the URL**: Once deployed, copy your backend URL (e.g., `https://product-explorer-api.onrender.com`).
 
-3. **Frontend Setup**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-   The frontend will be available at `http://localhost:3001` (or whichever port Next.js picks).
+## 3. Deploy Frontend (Next.js) to Vercel
 
-## Option 2: CI/CD Pipeline
+Vercel is the creators of Next.js and offers the best free hosting.
 
-This project includes a GitHub Actions workflow `.github/workflows/ci-cd.yml` that handles automated building and testing.
+1. **Dashboard**: Go to [vercel.com](https://vercel.com).
+2. **Add New Project**: Import your `Khanz9664/ProductDataExplorer` repo.
+3. **Configure Project**:
+   - **Root Directory**: Select `frontend` (Click "Edit" next to Root Directory).
+   - **Framework Preset**: Next.js (Auto-detected).
+   - **Environment Variables**:
+     - `NEXT_PUBLIC_API_URL`: (Paste your Render Backend URL, e.g., `https://product-explorer-api.onrender.com`)
+       - *Note*: Ensure no trailing slash `/` at the end if your code appends paths like `/products`.
+4. **Deploy**: Click "Deploy".
 
-### Workflow Triggers
-- Pushes to `main` calls the `build-and-test` job.
-- Pull Requests to `main` calls the `build-and-test` job.
+## 4. Final Configuration
 
-### Workflow Steps
-1. **Build & Test**: Installs dependencies and verifies `npm run build` for both Backend and Frontend.
-2. **Docker Build**: Builds a Docker image for the backend (demonstration of containerization).
+1. **CORS**: If you encounter CORS errors on the frontend:
+   - Update your NestJS `main.ts` to allow the Vercel domain.
+   - Or set `cors: true` / specific origin in `NestFactory.create`.
+   - Redeploy Backend if you changed code.
 
-### Deploying to Cloud Providers
-- **Railway/Render**: Connect your GitHub repository. These platforms can auto-detect the `backend/package.json` and start the service. ensure you set the `DATABASE_URL` environment variable in their dashboard.
-- **Docker**: You can push the image built in the CI/CD pipeline to a registry (Docker Hub/ECR) and deploy it to any container orchestrator (ECS, Kubernetes).
+## Local Development with Docker
 
-## Troubleshooting
+1. **Start Infrastructure**: `docker-compose up -d` (Postgres + Redis)
+2. **Backend**: `cd backend && npm run start:dev`
+3. **Frontend**: `cd frontend && npm run dev`
 
-- **Database Connection Error**: Ensure the `postgres` container is running (`docker ps`) and the `DATABASE_URL` matches the credentials in `docker-compose.yml`.
-- **Scraper Issues**: The Playwright scraper runs in a headless browser. Ensure dependencies are installed (`npx playwright install-deps` might be needed in some bare-metal Linux environments).
+## CI/CD Pipeline
+
+The `.github/workflows/ci-cd.yml` file automates:
+- **Build & Test**: Runs on every push to `main` to ensure code quality.
+- **Docker Build**: Verifies the backend container can be built.
+
