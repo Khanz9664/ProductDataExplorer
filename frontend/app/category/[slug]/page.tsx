@@ -2,7 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 async function getCategory(slug: string) {
-    const res = await fetch(`http://localhost:3000/categories/${slug}`, { cache: 'no-store' });
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const res = await fetch(`${API_URL}/categories/${slug}`, { cache: 'no-store' });
     if (res.status === 404) return null;
     if (!res.ok) throw new Error('Failed to fetch category');
     return res.json();
@@ -24,7 +25,8 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                 </div>
                 <form action={async () => {
                     'use server';
-                    await fetch(`http://localhost:3000/categories/${params.slug}/refresh`, { method: 'POST' });
+                    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+                    await fetch(`${API_URL}/categories/${params.slug}/refresh`, { method: 'POST' });
                 }}>
                     <button type="submit" className="text-sm border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                         Refresh Category

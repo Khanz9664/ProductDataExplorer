@@ -1,7 +1,8 @@
 import Link from 'next/link';
 
 async function getProduct(id: string) {
-    const res = await fetch(`http://localhost:3000/products/${id}`, { cache: 'no-store' });
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const res = await fetch(`${API_URL}/products/${id}`, { cache: 'no-store' });
     if (res.status === 404) return null;
     if (!res.ok) throw new Error('Failed to fetch product');
     return res.json();
@@ -9,7 +10,8 @@ async function getProduct(id: string) {
 
 async function refreshProduct(id: string) {
     'use server';
-    await fetch(`http://localhost:3000/products/${id}/refresh`, { method: 'POST' });
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    await fetch(`${API_URL}/products/${id}/refresh`, { method: 'POST' });
 }
 
 import ProductHistoryTracker from '@/components/ProductHistoryTracker';
@@ -108,7 +110,8 @@ export default async function ProductPage({ params }: { params: { id: string } }
                             {/* Simple form action to refresh data */}
                             <form action={async () => {
                                 'use server';
-                                await fetch(`http://localhost:3000/products/${params.id}/refresh`, { method: 'POST' });
+                                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+                                await fetch(`${API_URL}/products/${params.id}/refresh`, { method: 'POST' });
                             }}>
                                 <button type="submit" className="inline-block border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
                                     Refresh Data

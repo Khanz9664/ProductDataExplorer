@@ -1,7 +1,8 @@
 import Link from 'next/link';
 
 async function getCategories() {
-  const res = await fetch('http://localhost:3000/categories', { cache: 'no-store' });
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const res = await fetch(`${API_URL}/categories`, { cache: 'no-store' });
   if (!res.ok) {
     // Graceful fallback or error handling
     console.error('Failed to fetch categories');
