@@ -1,5 +1,5 @@
 # Use official Playwright image to ensure all browser dependencies are present
-FROM mcr.microsoft.com/playwright:v1.49.0-jammy AS builder
+FROM mcr.microsoft.com/playwright:v1.57.0-jammy AS builder
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -21,7 +21,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Production stage - use same base to ensure runtime deps exist
-FROM mcr.microsoft.com/playwright:v1.49.0-jammy
+FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
 WORKDIR /usr/src/app
 
