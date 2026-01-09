@@ -31,7 +31,6 @@ export class ScraperService {
             },
             // Reduce memory footprint
             persistStorage: false,
-            writeMetadata: false,
         });
 
         const crawler = new PlaywrightCrawler({
